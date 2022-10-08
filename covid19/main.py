@@ -4,7 +4,7 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 
 # data
-df = pd.read_csv('covid_19_indonesia_time_series_all.csv')
+df = pd.read_csv('./covid_19_indonesia_time_series_all.csv')
 # delete unused/unrelevant columns
 df = df.dropna(axis=1, how='all')
 df = df.drop(labels=['Location ISO Code', 'Special Status', 'Country','Continent', 'Time Zone', 'Location Level'],axis=1)
