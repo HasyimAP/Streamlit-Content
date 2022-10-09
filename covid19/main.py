@@ -15,7 +15,7 @@ df_ind = df[df['Location'] == 'Indonesia']
 
 # webapps design
 st.set_page_config(
-    page_title='Dashboard',
+    page_title='IND Covid-19',
     page_icon=':bar_chart:',
     layout='wide'
 )
@@ -26,6 +26,7 @@ st.header('Indonesia Covid-19 Update')
 # ===============================
 st.subheader('Total active cases from all over Indonesia')
 st.write('Total active cases of covid-19 in Indonesia since March 2nd 2020 to September 16th 2022. Active cases refer to the number of infected people.')
+st.write('You can zoom-in the graph by clicking and dragging on the plot and double-click to zoom-out')
 
 fig_indo = px.line(df_ind, x='Date', y='Total Active Cases', width=1280, height=480)
 st.plotly_chart(fig_indo)
