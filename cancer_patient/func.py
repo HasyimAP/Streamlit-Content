@@ -1,5 +1,4 @@
 import random
-from turtle import width
 import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
