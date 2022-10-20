@@ -14,7 +14,7 @@ path = os.path.dirname(__file__)
 df = pd.read_excel(path + '/Group E. cancer patient data sets.xlsx')
 
 # page title
-icon = Image.open('vaccine.png')
+icon = Image.open(path + '/vaccine.png')
 
 st.set_page_config(
     page_title='Cancer Patient',
