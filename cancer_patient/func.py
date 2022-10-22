@@ -1,4 +1,5 @@
 import random
+from matplotlib.axis import XAxis
 import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
@@ -102,3 +103,23 @@ def the_histogram(df, col_selected):
 
     return fig
 
+def grouped_boxplot(df, x_axis, y_axis):
+    fig = go.Figure()
+
+    x_values = [x for x in df[x_axis].unique()]
+
+    for x in x_values:
+        fig.add_trace(
+            go.Box(
+                y=df[df[x_axis] == x][y_axis],
+                boxmean='sd',
+                name=x
+            )
+        )
+
+    fig.update_layout(
+        xaxis_title=x_axis,
+        yaxis_title=y_axis
+    )
+
+    return fig
