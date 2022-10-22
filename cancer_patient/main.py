@@ -400,4 +400,10 @@ st.dataframe(norm_test_df)
 st.header('Conclusion')
 '''
 The histogram, skewness, and kurtosis shows that all the distribution of all variables from the dataset is approximately close to normal distribution. BUT, according to the result of the normality tests using Kolmogrov-Smirnov test and Shapiro-Wilk test shows that all variables from the dataset are NOT close/similar to normal distribution.
+
+Current answer *why normality test says data is not normal, but the other analysis says otherwise*:
+
+Looking at a non-significant p-value for any test doesn't lend support to the null hypothesis. In this case, a non-significant SW doesn't show normality-- it just means the sample **doesn't have enough information** to suggest stronger incompatibility with normality which may be **due to sample size or just due to the actual distribution (or some kind of bias)**.
+
+Relying too much on formal tests of normality can lead you astray, as they are often very powerful to detect even the slightest variation from normality which may have zero practical importance. Using subject matter expertise is often useful in statistics, and this is one where **blindly following a p-value is likely to lead you astray**.
 '''
