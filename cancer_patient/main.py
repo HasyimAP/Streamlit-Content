@@ -1,4 +1,5 @@
 import os
+import math
 import pandas as pd
 import seaborn as sns
 import streamlit as st
@@ -125,7 +126,7 @@ Steps taken in this process are:
     - 700 -> 7
     - 222 -> 2
     - 20 -> 2
-    - 11 ->
+    - 11 -> 1
 2. Replace the outliers that we can't determine as an entry mistake as missing values.
 3. Imputation using linear regression on the missing value.
 '''
@@ -221,13 +222,34 @@ Let's do data visualization to simplify the data analysis process.
 fix_df = df_2.copy()
 fix_df = fix_df.drop('Patient Id', axis=1)
 
-dv_1, dv_2, dv_3, dv_4 = st.tabs(['Dataframe', 'Histogram', 'Bar chart', 'Boxplot'])
+dv_1, dv_2, dv_3, dv_4, dv_5 = st.tabs(['Dataframe', 'Statistics', 'Histogram', 'Bar chart', 'Boxplot'])
 
 with dv_1:
     st.write('Here\'s dataframe that will be used in analyzing process. Please take a note that there\'s no Patient Id column, because that column is irrelevant in this analysis process.')
     st.dataframe(fix_df)
 
 with dv_2:
+    stat_desc = fix_df.describe()
+    st.dataframe(stat_desc)
+
+    skew_kurt = pd.DataFrame(columns=['Variance', 'Skewness', 'SE of Skewness', 'Kurtosis', 'SE of Kurtosis'])
+    
+    skew_kurt['Variance'] = fix_df.var()
+    
+    skew_kurt['Skewness'] = fix_df.skew()
+
+    n = fix_df.shape[0]
+    SE_skew = math.sqrt((6*n*(n-1))/((n-2)*(n+1)*(n+3)))
+    skew_kurt['SE of Skewness'] = skew_kurt['SE of Skewness'].fillna(SE_skew)
+
+    skew_kurt['Kurtosis'] = fix_df.kurt()
+    
+    SE_kurt = 2 * SE_skew * math.sqrt((n**2-1)/((n-3)*(n+5)))
+    skew_kurt['SE of Kurtosis'] = skew_kurt['SE of Kurtosis'].fillna(SE_kurt)
+
+    st.dataframe(skew_kurt.T)
+
+with dv_3:
     hist_column = st.selectbox(
         'Select column',
         (fix_df.columns.tolist())
@@ -236,7 +258,7 @@ with dv_2:
     fig = the_histogram(fix_df, hist_column)
     st.plotly_chart(fig)
 
-with dv_3:
+with dv_4:
     bar_column = st.selectbox(
         'Select column ',
         (fix_df.columns.tolist())
@@ -261,7 +283,7 @@ with dv_3:
 
     st.plotly_chart(fig)
 
-with dv_4:
+with dv_5:
     col_1, col_2 = st.columns(2)
 
     with col_1:
@@ -276,13 +298,7 @@ with dv_4:
             (fix_df.columns.tolist())
         )
 
-    fig = px.box(
-        fix_df,
-        x=box_col_1,
-        y=box_col_2, 
-        points='all',
-        notched=True
-    )
+    fig = grouped_boxplot(fix_df, box_col_1, box_col_2)
 
     fig.update_layout(
         width=1280,
