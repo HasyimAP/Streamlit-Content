@@ -399,5 +399,5 @@ st.dataframe(norm_test_df)
 # conclusion
 st.header('Conclusion')
 '''
-The histograms, skewness, kurtosis and Kolmogorov-Smirnov normality tests indicate that all the relevant variables are approximately normal. Also due to the fact that the sample size n > 300.
+The histograms, skewness, kurtosis and Kolmogorov-Smirnov normality tests indicate that all the relevant variables are NOT approximately normal. Also due to the fact that the sample size n > 300.
 '''
