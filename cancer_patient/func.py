@@ -113,7 +113,7 @@ def grouped_boxplot(df, x_axis, y_axis):
             go.Box(
                 y=df[df[x_axis] == x][y_axis],
                 boxmean='sd',
-                name=x
+                name=str(x)
             )
         )
 
