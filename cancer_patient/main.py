@@ -26,6 +26,17 @@ st.set_page_config(
 # content
 # =========================================================
 st.title('Cancer Patients Data')
+content_1, content_2 = st.columns(2)
+
+with content_1:
+    '''
+    Cancer is a disease in which some of the body\'s cells grow uncontrollably and spread to other parts of the body. Cancer is the second leading cause of death worldwide and is responsible for 16.5% of all deaths. Lung cancer is the most common subtype of cancer that causes death. Some of the biggest risk factors for developing cancer include obesity, tobacco smoking, viral infections, UV radiation overexposure, genetic predispositions and regular alcohol consumption. Symptoms of cancer vary and are location-specific but may include a persistent lump, pain, weight loss, fatigue and persistent coughing. 
+    '''
+
+with content_2:
+    image = Image.open(path + '/lung cancer.jpg')
+    st.image(image, width=240)
+
 st.header('Table of Contents')
 '''
 - [About The Dataset](#about-the-dataset)
@@ -34,6 +45,7 @@ st.header('Table of Contents')
     - Handling outliers
     - Handling missing data
 - [Data Visualization](#data-visualization)
+- [Tests of Normality](#tests-of-normality)
 - [Conclusion](#conclusion)
 '''
 
@@ -221,8 +233,16 @@ Let's do data visualization to simplify the data analysis process.
 
 fix_df = df_2.copy()
 fix_df = fix_df.drop('Patient Id', axis=1)
+fix_df = fix_df.astype(int)
 
-dv_1, dv_2, dv_3, dv_4, dv_5 = st.tabs(['Dataframe', 'Statistics', 'Histogram', 'Bar chart', 'Boxplot'])
+dv_1, dv_2, dv_3, dv_4, dv_5, dv_6 = st.tabs([
+    'Dataframe', #1
+    'Statistics', #2
+    'Histogram', #3
+    'Bar chart', #4
+    'Boxplot', #5
+    'Scatter plot' #6
+])
 
 with dv_1:
     st.write('Here\'s dataframe that will be used in analyzing process. Please take a note that there\'s no Patient Id column, because that column is irrelevant in this analysis process.')
@@ -266,7 +286,7 @@ with dv_4:
 
     fig = px.bar(
         fix_df,
-        x=fix_df[bar_column].unique(),
+        x=fix_df[bar_column].value_counts().index,
         y=fix_df[bar_column].value_counts(),
         text_auto=''
     )
@@ -307,5 +327,76 @@ with dv_5:
 
     st.plotly_chart(fig)
 
+with dv_6:
+    col_1, col_2 = st.columns(2)
+
+    col_param = fix_df.columns.tolist()
+    col_param.remove('Level')
+
+    with col_1:
+        scatter_col_1 = st.selectbox(
+            'Select 1st variable (x axis)',
+            (col_param)
+        )
+
+    with col_2:
+        scatter_col_2 = st.selectbox(
+            'Select 2nd variable (y axis)',
+            (col_param)
+        )
+
+    fig = px.scatter(fix_df, x=scatter_col_1, y=scatter_col_2, color='Level', trendline='ols')
+
+    st.plotly_chart(fig)
+
+# normality test
+st.subheader('Tests of Normality')
+'''
+The aim of this week’s report is to test if the data follows a normal distribution.
+
+Null hypothesis: (P>0.05) 
+
+The values are sampled from a population that follows a normal distribution.
+
+Alternative hypothesis: (P<=0.05)
+
+The values are not sampled from a population that follows a normal distribution.
+'''
+
+y = [
+    ('Kolmogorov-Smirnov', 'Statistic'),
+    ('Kolmogorov-Smirnov', 'N'),
+    ('Kolmogorov-Smirnov', 'p-value'),
+    ('Shapiro-Wilk', 'Statistic'),
+    ('Shapiro-Wilk', 'N'),
+    ('Shapiro-Wilk', 'p-value')
+]
+col_list = pd.MultiIndex.from_tuples(y)
+
+norm_test_df = pd.DataFrame(
+    index=fix_df.columns.tolist(),
+    columns=col_list
+)
+
+norm_test_df.loc[:, ('Kolmogorov-Smirnov','N')] = 1000
+norm_test_df.loc[:, ('Shapiro-Wilk','N')] = 1000
+
+for i in fix_df.columns.tolist():
+    ks_stat = stats.kstest(fix_df[i], stats.norm.cdf, alternative='less').statistic
+    ks_p = stats.kstest(fix_df[i], stats.norm.cdf, alternative='less').pvalue
+    norm_test_df.at[i, ('Kolmogorov-Smirnov', 'Statistic')] = ks_stat
+    norm_test_df.at[i, ('Kolmogorov-Smirnov', 'p-value')] = ks_p
+
+    sw_stat = stats.shapiro(fix_df[i]).statistic
+    sw_p = stats.shapiro(fix_df[i]).pvalue
+    norm_test_df.at[i, ('Shapiro-Wilk', 'Statistic')] = sw_stat
+    norm_test_df.at[i, ('Shapiro-Wilk', 'p-value')] = sw_p
+    
+
+st.dataframe(norm_test_df)
+
 # conclusion
 st.header('Conclusion')
+'''
+The histograms, skewness, kurtosis and Kolmogorov-Smirnov normality tests indicate that all the relevant variables are approximately normal. Also due to the fact that the sample size n > 300.
+'''
