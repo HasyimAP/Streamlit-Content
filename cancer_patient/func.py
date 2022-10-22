@@ -107,6 +107,7 @@ def grouped_boxplot(df, x_axis, y_axis):
     fig = go.Figure()
 
     x_values = [x for x in df[x_axis].unique()]
+    x_values.sort()
 
     for x in x_values:
         fig.add_trace(
