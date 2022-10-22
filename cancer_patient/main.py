@@ -7,6 +7,7 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 
 from func import *
+from func import grouped_boxplot
 from PIL import Image
 from scipy import stats
 
