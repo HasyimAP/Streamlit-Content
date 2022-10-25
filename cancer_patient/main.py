@@ -5,6 +5,7 @@ import seaborn as sns
 import streamlit as st
 import plotly.express as px
 import matplotlib.pyplot as plt
+import statsmodels.graphics.gofplots as sm
 
 from func import *
 from func import grouped_boxplot
@@ -236,13 +237,14 @@ fix_df = df_2.copy()
 fix_df = fix_df.drop('Patient Id', axis=1)
 fix_df = fix_df.astype(int)
 
-dv_1, dv_2, dv_3, dv_4, dv_5, dv_6 = st.tabs([
+dv_1, dv_2, dv_3, dv_4, dv_5, dv_6, dv_7 = st.tabs([
     'Dataframe', #1
     'Statistics', #2
     'Histogram', #3
     'Bar chart', #4
     'Boxplot', #5
-    'Scatter plot' #6
+    'Scatter plot', #6
+    'Q-Q plot' #7
 ])
 
 with dv_1:
@@ -347,6 +349,16 @@ with dv_6:
         )
 
     fig = px.scatter(fix_df, x=scatter_col_1, y=scatter_col_2, color='Level', trendline='ols')
+
+    st.plotly_chart(fig)
+
+with dv_7:
+    qq_col = st.selectbox(
+        'Please choose a column',
+        (fix_df.columns.tolist())
+    )
+
+    fig = sm.ProbPlot(fix_df[qq_col]).qqplot(line='s')
 
     st.plotly_chart(fig)
 
