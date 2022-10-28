@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 import statsmodels.graphics.gofplots as sm
 
 from func import *
-from func import grouped_boxplot
 from PIL import Image
 from scipy import stats
+from func import grouped_boxplot
 
 # dataset
 path = os.path.dirname(__file__)
@@ -48,6 +48,7 @@ st.header('Table of Contents')
     - Handling missing data
 - [Data Visualization](#data-visualization)
 - [Tests of Normality](#tests-of-normality)
+- [Parametric Test](#parametric-tests)
 - [Conclusion](#conclusion)
 '''
 
@@ -374,7 +375,7 @@ with dv_8:
     st.plotly_chart(fig)
 
 # normality test
-st.subheader('Tests of Normality')
+st.header('Tests of Normality')
 '''
 The aim of this week’s report is to test if the data follows a normal distribution.
 
@@ -415,10 +416,73 @@ for i in fix_df.columns.tolist():
     sw_p = stats.shapiro(fix_df[i]).pvalue
     norm_test_df.at[i, ('Shapiro-Wilk', 'Statistic')] = sw_stat
     norm_test_df.at[i, ('Shapiro-Wilk', 'p-value')] = sw_p
-    
 
 st.dataframe(norm_test_df)
 
+# =========================================================
+# parametric test
+st.header('Parametric tests')
+'''
+Before we do the parametric test, we should choose how our sample created. The sample will be created according to these 3 parameters below.
+'''
+
+sample_df = fix_df.copy()
+
+param_1, param_2 = st.columns(2)
+
+with param_1:
+    age_size = st.slider(
+        'Age range:',
+        int(sample_df['Age'].unique().min()),
+        int(sample_df['Age'].unique().max()),
+        (int(sample_df['Age'].unique().min()), int(sample_df['Age'].unique().max()))
+    )
+
+sample_df = sample_df.query('Age >= @age_size[0] and Age <= @age_size[1]')
+
+with param_2:
+    level_size = st.multiselect(
+        'Level of the cancer:',
+        options=sample_df['Level'].unique(),
+        default=sample_df['Level'].unique()
+    )
+
+sample_df = sample_df.query('Level == @level_size')
+
+sample_size = st.slider('Choose sample size:', 0, sample_df.shape[0], int(0.2*sample_df.shape[0]))
+
+sample_df = sample_df.sample(sample_size)
+
+pt_1, pt_2, pt_3, pt_4, pt_5 = st.tabs([
+    'Sample',
+    'One sample T-Test',
+    'Independent sample T-Test',
+    'Paired-samples T-Test',
+    'ANOVA'
+])
+
+with pt_1:
+    st.dataframe(sample_df)
+
+with pt_2:
+    '''
+    **Hypothesis**
+
+    *Null hypothesis H0*: The mean value of the population is equal to or greater than that of the specified value of the sample
+
+    *Alternative hypothesis H1*: The mean value of the population is smaller than the specified values
+    '''
+    TTest_1samp = pd.DataFrame(
+        index=sample_df.columns.tolist(),
+        columns=['t-statistic', 'p-value']
+    )
+
+    TTest_1samp['t-statistic'] = stats.ttest_1samp(fix_df, sample_df.mean(), alternative='less').statistic
+    TTest_1samp['p-value'] = stats.ttest_1samp(fix_df, sample_df.mean(), alternative='less').pvalue
+
+    st.dataframe(TTest_1samp.T)
+
+# =========================================================
 # conclusion
 st.header('Conclusion')
 '''
