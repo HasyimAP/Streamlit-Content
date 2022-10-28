@@ -1,5 +1,4 @@
 import random
-from matplotlib.axis import XAxis
 import numpy as np
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
