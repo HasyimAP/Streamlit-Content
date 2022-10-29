@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import streamlit as st
 import plotly.express as px
+import statsmodels.api as smapi
 import matplotlib.pyplot as plt
 import statsmodels.graphics.gofplots as sm
 
@@ -11,6 +12,7 @@ from func import *
 from PIL import Image
 from scipy import stats
 from func import grouped_boxplot
+from statsmodels.formula.api import ols
 
 # dataset
 path = os.path.dirname(__file__)
@@ -451,36 +453,121 @@ sample_df = sample_df.query('Level == @level_size')
 
 sample_size = st.slider('Choose sample size:', 0, sample_df.shape[0], int(0.2*sample_df.shape[0]))
 
-sample_df = sample_df.sample(sample_size)
+sample_1df = sample_df.sample(sample_size)
 
-pt_1, pt_2, pt_3, pt_4, pt_5 = st.tabs([
+pt_1, pt_2, pt_3, pt_4, pt_5, pt_6 = st.tabs([
     'Sample',
     'One sample T-Test',
     'Independent sample T-Test',
     'Paired-samples T-Test',
-    'ANOVA'
+    'One-way ANOVA',
+    'Two-way ANOVA'
 ])
 
 with pt_1:
-    st.dataframe(sample_df)
+    st.dataframe(sample_1df)
 
 with pt_2:
     '''
     **Hypothesis**
 
-    *Null hypothesis H0*: The mean value of the population is equal to or greater than that of the specified value of the sample
+    *Null hypothesis **H0***: The mean value of the population is equal to or greater than that of the specified value of the sample
 
-    *Alternative hypothesis H1*: The mean value of the population is smaller than the specified values
+    *Alternative hypothesis **H1***: The mean value of the population is smaller than the specified values
     '''
     TTest_1samp = pd.DataFrame(
+        index=sample_1df.columns.tolist(),
+        columns=['t-statistic', 'p-value']
+    )
+
+    TTest_1samp['t-statistic'] = stats.ttest_1samp(fix_df, sample_1df.mean(), alternative='less').statistic
+    TTest_1samp['p-value'] = stats.ttest_1samp(fix_df, sample_1df.mean(), alternative='less').pvalue
+
+    st.dataframe(TTest_1samp.T)
+
+with pt_3:
+    '''
+    *Null hypothesis **H0***: The mean value of the two independent groups is equal
+    
+    *Alternative hypothesis **H1***: The mean values of the two independent groups are different
+
+    We will create 2 samples with the same parameters that have been specified above, but rest asured because the sample will not be exactly the sample.
+    '''
+
+    sample_2df = sample_df.sample(2*sample_size)
+    sample_3df = sample_2df.sample(sample_size)
+    sample_2df = sample_2df.drop(sample_3df.index)
+
+    TTest_ind = pd.DataFrame(
         index=sample_df.columns.tolist(),
         columns=['t-statistic', 'p-value']
     )
 
-    TTest_1samp['t-statistic'] = stats.ttest_1samp(fix_df, sample_df.mean(), alternative='less').statistic
-    TTest_1samp['p-value'] = stats.ttest_1samp(fix_df, sample_df.mean(), alternative='less').pvalue
+    TTest_ind['t-statistic'] = stats.ttest_ind(sample_3df, sample_2df, alternative='two-sided').statistic
+    TTest_ind['p-value'] = stats.ttest_ind(sample_3df, sample_2df, alternative='two-sided').pvalue
 
-    st.dataframe(TTest_1samp.T)
+    st.dataframe(TTest_ind.T)
+
+with pt_4:
+    '''
+    *Null hypothesis **H0***: The mean value of the two dependent groups is equal
+    
+    *Alternative hypothesis **H1***: The mean values of the two dependent groups are different
+
+    Paired-samples T-Test are not suitable to do for this dataset. The reason why is we don't have any dependent samples from this dataset because the data only measured once.
+
+    Example cases to use paired-samples T-Test:
+
+    We want to compare the test score of students before and after taking classes. Sample 1 is the test scores of the students before taking classes. And sample 2 is the test scores of the students after taking classes. We can use paired-samples T-Test on sample 1 and 2 because those 2 samples came from the same subject, but from different time. 
+    '''
+
+with pt_5:
+    '''
+    *Null hypothesis **H0***: There are no significant differences between the means of the individual groups
+    
+    *Alternative hypothesis **H1***: At least two group means are significantly different from each other
+
+    2 sample created on this test is the same with the Independent sample T-Test.
+    '''
+
+    sample_2df = sample_df.sample(2*sample_size)
+    sample_3df = sample_2df.sample(sample_size)
+    sample_2df = sample_2df.drop(sample_3df.index)
+
+    oneway_ANOVA = pd.DataFrame(
+        index=sample_df.columns.tolist(),
+        columns=['statistic', 'p-value']
+    )
+
+    oneway_ANOVA['statistic'] = stats.f_oneway(sample_3df, sample_2df).statistic
+    oneway_ANOVA['p-value'] = stats.f_oneway(sample_3df, sample_2df).pvalue
+
+    st.dataframe(oneway_ANOVA.T)
+
+    with pt_6:
+        '''
+        *Null hypothesis **H0***: There is a significant effect of the variable to the level of cancer
+    
+        *Alternative hypothesis **H1***: There is no significant effect of the variable to the level of cancer
+
+        Accept H0 if p-value is less than 0.05.
+
+        *Note*: we don't do any sampling for this test. We directly use the dataset from after the data cleaning process.
+        '''
+        
+        temp_df = fix_df.copy()
+        temp_df.columns = temp_df.columns.str.replace(' ', '_')
+
+        string_formula = 'Level ~ '
+        col_list = temp_df.columns.tolist()
+        col_list.remove('Level')
+        for x in col_list:
+            string_formula += f'+ C({x})'
+    
+        model = ols(string_formula, data=temp_df).fit()
+        twoway_ANOVA = smapi.stats.anova_lm(model, typ=2)
+
+        st.dataframe(twoway_ANOVA)
 
 # =========================================================
 # conclusion
