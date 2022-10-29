@@ -493,7 +493,7 @@ with pt_3:
     
     *Alternative hypothesis **H1***: The mean values of the two independent groups are different
 
-    We will create 2 samples with the same parameters that have been specified above, but rest asured because the sample will not be exactly the sample.
+    We will create 2 samples with the same parameters that have been specified above, but rest asured because the sample will not be exactly the same to each other.
 
     We can reject H0 in favor of H1 if p-value less than 0.05
     '''
