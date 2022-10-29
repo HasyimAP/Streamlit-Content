@@ -474,6 +474,8 @@ with pt_2:
     *Null hypothesis **H0***: The mean value of the population is equal to or greater than that of the specified value of the sample
 
     *Alternative hypothesis **H1***: The mean value of the population is smaller than the specified values
+
+    We can reject H0 in favor of H1 if p-value less than 0.05
     '''
     TTest_1samp = pd.DataFrame(
         index=sample_1df.columns.tolist(),
@@ -492,6 +494,8 @@ with pt_3:
     *Alternative hypothesis **H1***: The mean values of the two independent groups are different
 
     We will create 2 samples with the same parameters that have been specified above, but rest asured because the sample will not be exactly the sample.
+
+    We can reject H0 in favor of H1 if p-value less than 0.05
     '''
 
     sample_2df = sample_df.sample(2*sample_size)
@@ -527,7 +531,9 @@ with pt_5:
     
     *Alternative hypothesis **H1***: At least two group means are significantly different from each other
 
-    2 sample created on this test is the same with the Independent sample T-Test.
+    The way 2 sample created on this test is the same with the Independent sample T-Test.
+
+    We can reject H0 in favor of H1 if p-value less than 0.05
     '''
 
     sample_2df = sample_df.sample(2*sample_size)
@@ -546,6 +552,8 @@ with pt_5:
 
     with pt_6:
         '''
+        How other variable affect the Level of the cancer?
+
         *Null hypothesis **H0***: There is a significant effect of the variable to the level of cancer
     
         *Alternative hypothesis **H1***: There is no significant effect of the variable to the level of cancer
