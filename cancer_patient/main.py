@@ -471,9 +471,9 @@ with pt_2:
     '''
     **Hypothesis**
 
-    *Null hypothesis **H0***: The mean value of the population is equal to or greater than that of the specified value of the sample
+    *Null hypothesis **H0***: The mean value of the population is equal to the specified value of the sample
 
-    *Alternative hypothesis **H1***: The mean value of the population is smaller than the specified values
+    *Alternative hypothesis **H1***: The mean value of the population is different from the specified values of the sample
 
     We can reject H0 in favor of H1 if p-value less than 0.05
     '''
@@ -550,32 +550,32 @@ with pt_5:
 
     st.dataframe(oneway_ANOVA.T)
 
-    with pt_6:
-        '''
-        How other variable affect the Level of the cancer?
+with pt_6:
+    '''
+    How other variable affect the Level of the cancer?
 
-        *Null hypothesis **H0***: There is a significant effect of the variable to the level of cancer
+    *Null hypothesis **H0***: There is a significant effect of the variable to the level of cancer
     
-        *Alternative hypothesis **H1***: There is no significant effect of the variable to the level of cancer
+    *Alternative hypothesis **H1***: There is no significant effect of the variable to the level of cancer
 
-        Accept H0 if p-value is less than 0.05.
+    Accept H0 if p-value is less than 0.05.
 
-        *Note*: we don't do any sampling for this test. We directly use the dataset from after the data cleaning process.
-        '''
+    *Note*: we don't do any sampling for this test. We directly use the dataset from after the data cleaning process.
+    '''
         
-        temp_df = fix_df.copy()
-        temp_df.columns = temp_df.columns.str.replace(' ', '_')
+    temp_df = fix_df.copy()
+    temp_df.columns = temp_df.columns.str.replace(' ', '_')
 
-        string_formula = 'Level ~ '
-        col_list = temp_df.columns.tolist()
-        col_list.remove('Level')
-        for x in col_list:
-            string_formula += f'+ C({x})'
+    string_formula = 'Level ~ '
+    col_list = temp_df.columns.tolist()
+    col_list.remove('Level')
+    for x in col_list:
+        string_formula += f'+ C({x})'
     
-        model = ols(string_formula, data=temp_df).fit()
-        twoway_ANOVA = smapi.stats.anova_lm(model, typ=2)
+    model = ols(string_formula, data=temp_df).fit()
+    twoway_ANOVA = smapi.stats.anova_lm(model, typ=2)
 
-        st.dataframe(twoway_ANOVA)
+    st.dataframe(twoway_ANOVA)
 
 # =========================================================
 # conclusion
