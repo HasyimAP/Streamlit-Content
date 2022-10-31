@@ -44,8 +44,57 @@ with st.expander('Column details'):
         st.write(f'{column_desc.iloc[i, 0]}: {column_desc.iloc[i, 1]}')
 
 '''
-Below here we can see how many missing values on each variables, on each country, and on each continent (excl. iso_code).
+Below here we can see how many missing values on each variables, on each country, and on each continent.
 '''
 
 md_1, md_2, md_3 = st.columns(3)
+
+with md_1:
+    null_data = pd.DataFrame(df.isna().sum(), columns=['total missing values'])
+
+    for curr_var in (null_data.index):
+        total_miss_data = null_data.loc[curr_var, 'total missing values']
+        pct = (total_miss_data/df.shape[0])*100
+        null_data.at[curr_var, 'miss data pct.'] = pct
+
+    st.dataframe(null_data)
+
+with md_2:
+    country_miss_data = pd.DataFrame(
+        columns=[
+            'country',
+            'total missing data',
+            'total data',
+            'miss data pct.'
+        ]
+    )
+
+    country_miss_data['country'] = df['country'].unique()
+
+    for i in range(country_miss_data.shape[0]):
+        curr_country = country_miss_data['country'][i]
+
+        total_miss_data = df[df['country'] == curr_country].isna().sum().sum()
+        country_miss_data.at[i, 'total missing data'] = total_miss_data
+
+        total_data = df[df['country'] == curr_country].shape[0] * df[df['country'] == curr_country].shape[1]
+        country_miss_data.at[i, 'total data'] = total_data
+
+        pct = (total_miss_data/total_data)*100
+        country_miss_data.at[i, 'miss data pct.'] = pct
+    
+    continent = df[df['iso_code'].isna() == True]['country'].unique().tolist()
+    continent.extend(['Antarctica', 'World'])
+    cont_miss_data = country_miss_data.loc[country_miss_data['country'].isin(continent)]
+    cont_miss_data = cont_miss_data.rename(columns={'country': 'continent'})
+    cont_miss_data.reset_index(inplace=True, drop=True)
+
+    i_drop = country_miss_data.index[country_miss_data['country'].isin(continent)].tolist()
+    country_miss_data = country_miss_data.drop(i_drop, axis=0)
+    country_miss_data.reset_index(drop=True, inplace=True)
+
+    st.dataframe(country_miss_data)
+
+with md_3:
+    st.dataframe(cont_miss_data)
 
