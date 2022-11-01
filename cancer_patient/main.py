@@ -208,17 +208,17 @@ with st.expander('Correlation\'s heatmap'):
 
     with tab_1:
         fig, ax = plt.subplots(figsize=(16, 10))
-        sns.heatmap(df_2.corr(method='pearson'), linewidths=0.1, center=0)
+        sns.heatmap(df_2.corr(method='pearson'), linewidths=0.1, center=0, annot=True)
         st.pyplot(fig)
 
     with tab_2:
         fig, ax = plt.subplots(figsize=(16, 10))
-        sns.heatmap(df_2.corr(method='kendall'), linewidths=0.1, center=0)
+        sns.heatmap(df_2.corr(method='kendall'), linewidths=0.1, center=0, annot=True)
         st.pyplot(fig)
 
     with tab_3:
         fig, ax = plt.subplots(figsize=(16, 10))
-        sns.heatmap(df_2.corr(method='spearman'), linewidths=0.1, center=0)
+        sns.heatmap(df_2.corr(method='spearman'), linewidths=0.1, center=0, annot=True)
         st.pyplot(fig)
 
     with tab_4:
@@ -531,22 +531,22 @@ with pt_5:
     
     *Alternative hypothesis **H1***: At least two group means are significantly different from each other
 
-    The way 2 sample created on this test is the same with the Independent sample T-Test.
+    There are a total of 3 groups divided by its cancer's level. Group 1 with low level cancer, group 2 with medium level cancer, and group 3 with high level cancer.
 
     We can reject H0 in favor of H1 if p-value less than 0.05
     '''
 
-    sample_2df = sample_df.sample(2*sample_size)
-    sample_3df = sample_2df.sample(sample_size)
-    sample_2df = sample_2df.drop(sample_3df.index)
+    low_df = fix_df[fix_df['Level'] == 1].drop('Level', axis=1)
+    mid_df = fix_df[fix_df['Level'] == 2].drop('Level', axis=1)
+    high_df = fix_df[fix_df['Level'] == 3].drop('Level', axis=1)
 
     oneway_ANOVA = pd.DataFrame(
-        index=sample_df.columns.tolist(),
+        index=mid_df.columns.tolist(),
         columns=['statistic', 'p-value']
     )
 
-    oneway_ANOVA['statistic'] = stats.f_oneway(sample_3df, sample_2df).statistic
-    oneway_ANOVA['p-value'] = stats.f_oneway(sample_3df, sample_2df).pvalue
+    oneway_ANOVA['statistic'] = stats.f_oneway(low_df, mid_df, high_df).statistic
+    oneway_ANOVA['p-value'] = stats.f_oneway(low_df, mid_df, high_df).pvalue
 
     st.dataframe(oneway_ANOVA.T)
 
@@ -576,6 +576,100 @@ with pt_6:
     twoway_ANOVA = smapi.stats.anova_lm(model, typ=2)
 
     st.dataframe(twoway_ANOVA)
+
+# =========================================================
+st.header('Non-Parametric Test')
+
+npt_1, npt_2, npt_3, npt_4 = st.tabs([
+    'Kruskal-Wallis Test',
+    'Wilcoxon-Test',
+    'Mann-Whitney U test',
+    'Friedman Test'
+])
+
+with npt_1:
+    '''
+    There are a total of 3 groups that divided by the level of patient cancer. Group 1 with low level cancer, group 2 with medium level cancer, and group 3 with high level cancer. From the table below we can see that all of the p-value from all variables are lower than 5%. This means that there are no significant differences in symptoms between the patient with low, medium, and high level cancer. So for the patients to know further about their cancer level it is advisable to ask professional (doctors) and not relying on how severe the symptoms are.
+    '''
+
+    low_df = fix_df[fix_df['Level'] == 1].copy()
+    mid_df = fix_df[fix_df['Level'] == 2].copy()
+    high_df = fix_df[fix_df['Level'] == 3].copy()
+
+    low_df = low_df[low_df['Level'] == 1].drop('Level', axis=1)
+    mid_df = mid_df[mid_df['Level'] == 2].drop('Level', axis=1)
+    high_df = high_df[high_df['Level'] == 3].drop('Level', axis=1)
+
+    kw_test = pd.DataFrame(
+        index=low_df.columns.tolist(),
+        columns=['statistic', 'p-value']
+    )
+
+    kw_test['statistic'] = stats.kruskal(low_df, mid_df, high_df).statistic
+    kw_test['p-value'] = stats.kruskal(low_df, mid_df, high_df).pvalue
+
+    st.dataframe(kw_test.T)
+
+with npt_3:
+
+    mw1_sample = fix_df.copy()
+    mw2_sample = fix_df.copy()
+
+    npt3_col_1, npt3_col_2 = st.columns(2)
+
+    with npt3_col_1:
+        age1_size = st.slider(
+            'Sample 1 age range:',
+            int(mw1_sample['Age'].unique().min()),
+            int(mw1_sample['Age'].unique().max()),
+            (int(mw1_sample['Age'].unique().min()), int(mw1_sample['Age'].unique().max()))
+        )
+
+        mw1_sample = mw1_sample.query('Age >= @age1_size[0] and Age <= @age1_size[1]')
+
+        level1_size = st.multiselect(
+            'Sample 1 level of the cancer:',
+            options=mw1_sample['Level'].unique(),
+            default=mw1_sample['Level'].unique()
+        )
+
+        mw1_sample = mw1_sample.query('Level == @level1_size')
+
+        sample1_size = st.slider('Choose sample 1 size:', 0, mw1_sample.shape[0], int(0.2*mw1_sample.shape[0]))
+
+        mw1_sample = mw1_sample.sample(sample1_size)
+
+    with npt3_col_2:
+        age2_size = st.slider(
+            'Sample 2 age range:',
+            int(mw2_sample['Age'].unique().min()),
+            int(mw2_sample['Age'].unique().max()),
+            (int(mw2_sample['Age'].unique().min()), int(mw2_sample['Age'].unique().max()))
+        )
+
+        mw2_sample = mw2_sample.query('Age >= @age2_size[0] and Age <= @age2_size[1]')
+
+        level2_size = st.multiselect(
+            'Sample 2 level of the cancer:',
+            options=mw2_sample['Level'].unique(),
+            default=mw2_sample['Level'].unique()
+        )
+
+        mw2_sample = mw2_sample.query('Level == @level1_size')
+
+        sample2_size = st.slider('Choose sample 2 size:', 0, mw2_sample.shape[0], int(0.2*mw2_sample.shape[0]))
+
+        mw2_sample = mw2_sample.sample(sample2_size)
+    
+    mw_test = pd.DataFrame(
+        index=mw1_sample.columns.tolist(),
+        columns=['statistic', 'p-value']
+    )
+
+    mw_test['statistic'] = stats.mannwhitneyu(mw1_sample, mw2_sample, alternative='two-sided').statistic
+    mw_test['p-value'] = stats.mannwhitneyu(mw1_sample, mw2_sample, alternative='two-sided').pvalue
+
+    st.dataframe(mw_test.T)
 
 # =========================================================
 # conclusion
