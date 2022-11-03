@@ -7,6 +7,7 @@ from PIL import Image
 # dataset
 path = os.path.dirname(__file__)
 df = pd.read_csv(path + '/owid-co2-data.csv')
+clean_df = pd.read_csv(path + '/clean-data.csv')
 
 # page title
 icon = Image.open(path + '/co2.png')
@@ -98,3 +99,30 @@ with md_2:
 with md_3:
     st.dataframe(cont_miss_data)
 
+'''
+The first thing to do is remove all country with all of its population data is missing. 
+Greenhouse gas emissions are generated from various industrial sectors. 
+And these various industrial sectors are run by humans. 
+So it feels strange if in a country or area that does not have data on the population living there to produce greenhouse gas emissions.
+We can observe/restore the other country/areas later if we want to analyze it individually, seperated from the others.
+
+We then do imputation on the missing values using Deep Learning.
+There are 6 variables that we will impute with care, and those are:
+- y: population; x: year
+- y: co2; year, population
+- y: cumulative_co2; x: year, population, co2
+- y: gdp; x: year, population, co2, cumulative_co2
+- y: primary_energy_consumption; x: year, population, co2, cumulative_co2, gdp
+y: dependent variable (variable we want to do the imputation on its missing values)
+
+x: independent variable (variable we control to find y)
+
+After there are no more missing values on those 6 variables, we will impute the other variables using these 6 variables as the independent variable. 
+We will have this new dataset after cleaning process as follows:
+'''
+'1. From ', df.shape[0], ' rows to ', clean_df.shape[0], ' rows.'
+'2. From ', df['country'].nunique(), ' countries/areas to ', clean_df['country'].nunique(), ' countries/areas.'
+'3. From ', df.isna().sum().sum(), ' missing values to ', clean_df.isna().sum().sum(), 'missing values. The only missing values on the new dataset after cleaning process is only on column iso_code'
+
+
+st.dataframe(clean_df)
