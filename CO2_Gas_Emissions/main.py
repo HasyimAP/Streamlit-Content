@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import pingouin as pg
 import streamlit as st
 import plotly.express as px
 import statsmodels.api as sm
@@ -15,7 +16,7 @@ from scipy import stats
 # dataset
 path = os.path.dirname(__file__)
 df = pd.read_csv(path + '/owid-co2-data.csv')
-clean_df = pd.read_csv(path + '/clean-data-2.csv')
+clean_df = pd.read_csv(path + '/clean-data-mae-sgd.csv')
 
 # page title
 icon = Image.open(path + '/co2.png')
@@ -386,9 +387,232 @@ After we find out that our data is not normally distributed we don't have to do 
 
 # =========================================================
 st.subheader('Kruskal-Wallis Test')
+'''
+In Kruskal-Wallis Test we will compare more than 2 countries/areas to check if they have similar distribution or not. We will define our hypothesis as follows:
+
+Null Hypothesis (H0): The data distribution between all samples/groups are **NOT** stochastically the same
+
+Alternative Hypothesis (H0): The data distribution between all samples/groups are stochastically the same
+
+We can reject H0 if the p-value on the variables we observed are less than 5%.
+'''
+
+sample_size = st.number_input(
+    'Number of samples (max. 10): ',
+    min_value=2,
+    max_value=10,
+    step=1
+)
+
+kw_country = st.multiselect(
+    'Choose the countries/areas:',
+    options=clean_df['country'].unique(),
+    max_selections=sample_size
+)
+
+kw_dict = []
+
+for country in kw_country:
+    kw_dict.append(clean_df[clean_df['country'] == country].drop(['iso_code', 'country'], axis=1))
+
+ks_df_index = clean_df.columns.tolist()
+ks_df_index.remove('iso_code')
+ks_df_index.remove('country')
+
+kw_df = pd.DataFrame(
+    index=ks_df_index,
+    columns=['statistic', 'p-value']
+)
+
+if sample_size == 2:
+    kw_df['statistic'] = stats.kruskal(kw_dict[0], kw_dict[1]).statistic
+    kw_df['p-value'] = stats.kruskal(kw_dict[0], kw_dict[1]).pvalue
+elif sample_size == 3:
+    kw_df['statistic'] = stats.kruskal(kw_dict[0], kw_dict[1], kw_dict[2]).statistic
+    kw_df['p-value'] = stats.kruskal(kw_dict[0], kw_dict[1], kw_dict[2]).pvalue
+elif sample_size == 4:
+    kw_df['statistic'] = stats.kruskal(kw_dict[0], kw_dict[1], kw_dict[2], kw_dict[3]).statistic
+    kw_df['p-value'] = stats.kruskal(kw_dict[0], kw_dict[1], kw_dict[2], kw_dict[3]).pvalue
+elif sample_size == 5:
+    kw_df['statistic'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4]
+    ).statistic
+    kw_df['p-value'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4]
+    ).pvalue
+elif sample_size == 6:
+    kw_df['statistic'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5]
+    ).statistic
+    kw_df['p-value'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5]
+    ).pvalue
+elif sample_size == 7:
+    kw_df['statistic'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5],
+        kw_dict[6]
+    ).statistic
+    kw_df['p-value'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5],
+        kw_dict[6]
+    ).pvalue
+elif sample_size == 8:
+    kw_df['statistic'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5],
+        kw_dict[6],
+        kw_dict[7]
+    ).statistic
+    kw_df['p-value'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5],
+        kw_dict[6],
+        kw_dict[7]
+    ).pvalue
+elif sample_size == 9:
+    kw_df['statistic'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5],
+        kw_dict[6],
+        kw_dict[7],
+        kw_dict[8]
+    ).statistic
+    kw_df['p-value'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5],
+        kw_dict[6],
+        kw_dict[7],
+        kw_dict[8]
+    ).pvalue
+elif sample_size == 10:
+    kw_df['statistic'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5],
+        kw_dict[6],
+        kw_dict[7],
+        kw_dict[8],
+        kw_dict[9]
+    ).statistic
+    kw_df['p-value'] = stats.kruskal(
+        kw_dict[0], 
+        kw_dict[1],
+        kw_dict[2],
+        kw_dict[3],
+        kw_dict[4], 
+        kw_dict[5],
+        kw_dict[6],
+        kw_dict[7],
+        kw_dict[8],
+        kw_dict[9]
+    ).pvalue
+
+st.dataframe(kw_df.T)
 
 # =========================================================
 st.subheader('Wilcoxon Test')
+'''
+In Wilcoxon test we need to determine 3 parameter, 1 country/are and 2 year. We the define our hypothesis:
+
+Null Hypothesis (H0): There's difference in data between those 2 years
+
+Alternative Hypothesis (H1): There's NO difference in data between those 2 years
+
+We can reject H0 in favor of H1 if the p-value on the variables we observed are less than 5%.
+'''
+
+w_col_1, w_col_2, w_col_3 = st.columns(3)
+
+with w_col_1:
+    w_year_1 = st.number_input(
+        'Year 1 for Wilcoxon Test',
+        min_value=clean_df['year'].min(),
+        max_value=clean_df['year'].max(),
+        value=clean_df['year'].min(),
+        step=1
+    )
+
+with w_col_2:
+    w_year_2 = st.number_input(
+        'Year 2 for Wilcoxon Test',
+        min_value=clean_df['year'].min(),
+        max_value=clean_df['year'].max(),
+        value=clean_df['year'].max(),
+        step=1
+    )
+
+with w_col_3:
+    w_country = st.selectbox(
+        'Select the observed country:',
+        (clean_df['country'].unique())
+    )
+
+wt_sample_1 = clean_df[clean_df['country'] == w_country][clean_df['year'] == w_year_1].drop(['iso_code', 'country', 'year'], axis=1)
+wt_sample_1.reset_index(inplace=True, drop=True)
+wt_sample_2 = clean_df[clean_df['country'] == w_country][clean_df['year'] == w_year_2].drop(['iso_code', 'country', 'year'], axis=1)
+wt_sample_2.reset_index(inplace=True, drop=True)
+
+wt_df = pd.DataFrame(
+    index=wt_sample_1.columns.tolist(),
+    columns=['statistic', 'p-value']
+)
+
+# for col in wt_sample_1.columns.tolist():
+#     wt_df.at[col, 'statistic'], wt_df[col, 'p-value'] = stats.wilcoxon(
+#         [wt_sample_1.loc[0, col]],
+#         [wt_sample_2.loc[0, col]]
+#     )
+
+wt_df['statistic'], wt_df['p-value'] = stats.wilcoxon(wt_sample_1, wt_sample_2, alternative='two-sided', zero_method='zsplit')
+
+st.dataframe(wt_df.T)
 
 # =========================================================
 st.subheader('Mann-Whitney U Test')
@@ -399,7 +623,7 @@ Null Hypothesis (H0): The data distribution underlying area 1 is **NOT** stochas
 
 Alternative Hypothesis (H0): The data distribution underlying area 1 is stochastically less than the distribution underlying area 2.
 
-We can reject H0 if the p-value on the variables we observed are less than 5%.
+We can reject H0 in favor of H1 if the p-value on the variables we observed are less than 5%.
 '''
 
 mw_side_1, mw_side_2 = st.columns(2)
@@ -436,6 +660,67 @@ st.dataframe(mw_test.T)
 
 # =========================================================
 st.subheader('Friedman Test')
+'''
+Friedman test is similar to wilcoxon, the difference is wilcoxon only use 2 dependent samples and friedman use 3 or more dependent test. 
+'''
+
+ft_col_1, ft_col_2, ft_col_3, ft_col_4 = st.columns(4)
+
+with ft_col_1:
+    ft_year_1 = st.number_input(
+        'Year 1 for Friedman Test',
+        min_value=clean_df['year'].min(),
+        max_value=clean_df['year'].max(),
+        value=clean_df['year'].min(),
+        step=1
+    )
+
+with ft_col_2:
+    ft_year_2 = st.number_input(
+        'Year 2 for Friedman Test',
+        min_value=clean_df['year'].min(),
+        max_value=clean_df['year'].max(),
+        value=int((clean_df['year'].min() + clean_df['year'].max())/2),
+        step=1
+    )
+
+with ft_col_3:
+    ft_year_3 = st.number_input(
+        'Year 3 for Friedman Test',
+        min_value=clean_df['year'].min(),
+        max_value=clean_df['year'].max(),
+        value=clean_df['year'].max(),
+        step=1
+    )
+
+with ft_col_4:
+    ft_country = st.selectbox(
+        'Select the observed country: ',
+        (clean_df['country'].unique())
+    )
+
+ft_sample_1 = clean_df[clean_df['country'] == ft_country][clean_df['year'] == ft_year_1].drop(['iso_code', 'year', 'country'], axis=1)
+ft_sample_1.reset_index(inplace=True, drop=True)
+ft_sample_2 = clean_df[clean_df['country'] == ft_country][clean_df['year'] == ft_year_2].drop(['iso_code', 'year', 'country'], axis=1)
+ft_sample_2.reset_index(inplace=True, drop=True)
+ft_sample_3 = clean_df[clean_df['country'] == ft_country][clean_df['year'] == ft_year_3].drop(['iso_code', 'year', 'country'], axis=1)
+ft_sample_3.reset_index(inplace=True, drop=True)
+
+ft_df = pd.DataFrame(
+    index=ft_sample_1.columns.tolist(),
+    columns=['statistic', 'p-value']
+)
+
+for col in ft_sample_1.columns.tolist():
+    ft_df.at[col, 'statistic'], ft_df.at[col, 'p-value'] = stats.friedmanchisquare(
+        [ft_sample_1.loc[0, col]],
+        [ft_sample_2.loc[0, col]],
+        [ft_sample_3.loc[0, col]],
+    )
+
+# ft_df['statistic'], ft_df['p-value'] = stats.friedmanchisquare(ft_sample_1, ft_sample_2, ft_sample_3)
+
+st.dataframe(ft_df.T)
 
 # =========================================================
 st.header('Correlation')
