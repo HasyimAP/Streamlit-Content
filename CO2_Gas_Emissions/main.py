@@ -14,7 +14,7 @@ from scipy import stats
 # dataset
 path = os.path.dirname(__file__)
 df = pd.read_csv(path + '/owid-co2-data.csv')
-clean_df = pd.read_csv(path + '/clean-data-mae-sgd.csv')
+clean_df = pd.read_csv(path + '/clean-data-mae-sgd-2.csv')
 
 # page title
 icon = Image.open(path + '/co2.png')
@@ -557,7 +557,7 @@ st.dataframe(kw_df.T)
 # =========================================================
 st.subheader('Wilcoxon Test')
 '''
-In Wilcoxon test we need to determine 3 parameter, 1 country/are and 2 year. We the define our hypothesis:
+In Wilcoxon test we need to determine 2 parameter year. These 2 parameters will create 2 sample with different year from all of data regarding the country/area. We then define our hypothesis:
 
 Null Hypothesis (H0): There's difference in data between those 2 years
 
@@ -566,7 +566,7 @@ Alternative Hypothesis (H1): There's NO difference in data between those 2 years
 We can reject H0 in favor of H1 if the p-value on the variables we observed are less than 5%.
 '''
 
-w_col_1, w_col_2, w_col_3 = st.columns(3)
+w_col_1, w_col_2 = st.columns(2)
 
 with w_col_1:
     w_year_1 = st.number_input(
@@ -586,27 +586,19 @@ with w_col_2:
         step=1
     )
 
-with w_col_3:
-    w_country = st.selectbox(
-        'Select the observed country:',
-        (clean_df['country'].unique())
-    )
-
-wt_sample_1 = clean_df[clean_df['country'] == w_country][clean_df['year'] == w_year_1].drop(['iso_code', 'country', 'year'], axis=1)
+wt_sample_1 = clean_df[clean_df['year'] == w_year_1].drop(['iso_code', 'country', 'year'], axis=1)
 wt_sample_1.reset_index(inplace=True, drop=True)
-wt_sample_2 = clean_df[clean_df['country'] == w_country][clean_df['year'] == w_year_2].drop(['iso_code', 'country', 'year'], axis=1)
+wt_sample_2 = clean_df[clean_df['year'] == w_year_2].drop(['iso_code', 'country', 'year'], axis=1)
 wt_sample_2.reset_index(inplace=True, drop=True)
+
+resize = min(wt_sample_1.shape[0], wt_sample_2.shape[0])
+wt_sample_1 = wt_sample_1.sample(resize)
+wt_sample_2 = wt_sample_2.sample(resize)
 
 wt_df = pd.DataFrame(
     index=wt_sample_1.columns.tolist(),
     columns=['statistic', 'p-value']
 )
-
-# for col in wt_sample_1.columns.tolist():
-#     wt_df.at[col, 'statistic'], wt_df[col, 'p-value'] = stats.wilcoxon(
-#         [wt_sample_1.loc[0, col]],
-#         [wt_sample_2.loc[0, col]]
-#     )
 
 wt_df['statistic'], wt_df['p-value'] = stats.wilcoxon(wt_sample_1, wt_sample_2, alternative='two-sided', zero_method='zsplit')
 
@@ -660,9 +652,15 @@ st.dataframe(mw_test.T)
 st.subheader('Friedman Test')
 '''
 Friedman test is similar to wilcoxon, the difference is wilcoxon only use 2 dependent samples and friedman use 3 or more dependent test. 
+
+Null Hyptothesis (H0): There is **NO** significant difference between data of the dependent samples.
+
+Alternative Hyptothesis (H0): There is significant difference between data of the dependent samples.
+
+We can reject H0 in favor of H1 if p-value are less than 5%.
 '''
 
-ft_col_1, ft_col_2, ft_col_3, ft_col_4 = st.columns(4)
+ft_col_1, ft_col_2, ft_col_3 = st.columns(3)
 
 with ft_col_1:
     ft_year_1 = st.number_input(
@@ -691,17 +689,12 @@ with ft_col_3:
         step=1
     )
 
-with ft_col_4:
-    ft_country = st.selectbox(
-        'Select the observed country: ',
-        (clean_df['country'].unique())
-    )
 
-ft_sample_1 = clean_df[clean_df['country'] == ft_country][clean_df['year'] == ft_year_1].drop(['iso_code', 'year', 'country'], axis=1)
+ft_sample_1 = clean_df[clean_df['year'] == ft_year_1].drop(['iso_code', 'year', 'country'], axis=1)
 ft_sample_1.reset_index(inplace=True, drop=True)
-ft_sample_2 = clean_df[clean_df['country'] == ft_country][clean_df['year'] == ft_year_2].drop(['iso_code', 'year', 'country'], axis=1)
+ft_sample_2 = clean_df[clean_df['year'] == ft_year_2].drop(['iso_code', 'year', 'country'], axis=1)
 ft_sample_2.reset_index(inplace=True, drop=True)
-ft_sample_3 = clean_df[clean_df['country'] == ft_country][clean_df['year'] == ft_year_3].drop(['iso_code', 'year', 'country'], axis=1)
+ft_sample_3 = clean_df[clean_df['year'] == ft_year_3].drop(['iso_code', 'year', 'country'], axis=1)
 ft_sample_3.reset_index(inplace=True, drop=True)
 
 ft_df = pd.DataFrame(
@@ -709,16 +702,28 @@ ft_df = pd.DataFrame(
     columns=['statistic', 'p-value']
 )
 
+resize = min(ft_sample_1.shape[0], ft_sample_2.shape[0], ft_sample_3.shape[0])
+ft_sample_1 = ft_sample_1.sample(resize)
+ft_sample_2 = ft_sample_2.sample(resize)
+ft_sample_3 = ft_sample_3.sample(resize)
+
 for col in ft_sample_1.columns.tolist():
     ft_df.at[col, 'statistic'], ft_df.at[col, 'p-value'] = stats.friedmanchisquare(
-        [ft_sample_1.loc[0, col]],
-        [ft_sample_2.loc[0, col]],
-        [ft_sample_3.loc[0, col]],
+        [ft_sample_1.loc[:, col]],
+        [ft_sample_2.loc[:, col]],
+        [ft_sample_3.loc[:, col]],
     )
 
 # ft_df['statistic'], ft_df['p-value'] = stats.friedmanchisquare(ft_sample_1, ft_sample_2, ft_sample_3)
 
 st.dataframe(ft_df.T)
+
+with st.expander('Non-Paramtrics Test Note'):
+    '''
+    Notice if we refresh the page, you can see that the p-value on the wilcoxon and friedman test changing. The reason behind this is because the size of the data is different between those year. Wilcoxon and friedman can only be done if all the testing data have the same size, if not it will return an error. So to handle this we do sampling according to the smaller data's size and the sampling is done randomly. 
+    
+    For example: the size of the data are 67 and 71. We will reduce the 2nd data (data's size 71) to 67, and that 67 values will be chosen randomly from the total of that 71 data.
+    '''
 
 # =========================================================
 st.header('Correlation')
