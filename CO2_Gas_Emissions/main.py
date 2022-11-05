@@ -1,9 +1,11 @@
 import os
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import streamlit as st
 import plotly.express as px
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
 import statsmodels.graphics.gofplots as gg
 
 from func import *
@@ -378,3 +380,86 @@ After doing all possible data visualization (lineplot, histogram, scatterplot, b
 
 # =========================================================
 st.header('Non-Parametric Test')
+'''
+After we find out that our data is not normally distributed we don't have to do parametric test and can go straight away to non-parametric test.
+'''
+
+# =========================================================
+st.subheader('Kruskal-Wallis Test')
+
+# =========================================================
+st.subheader('Wilcoxon Test')
+
+# =========================================================
+st.subheader('Mann-Whitney U Test')
+'''
+In the Mann-Whitney U Test we are going to compare 2 countries/areas and we will see if there are any differents between those 2 countries/areas. We will define our hypothesis as follows:
+
+Null Hypothesis (H0): The data distribution underlying area 1 is **NOT** stochastically less than the distribution underlying area 2.
+
+Alternative Hypothesis (H0): The data distribution underlying area 1 is stochastically less than the distribution underlying area 2.
+
+We can reject H0 if the p-value on the variables we observed are less than 5%.
+'''
+
+mw_side_1, mw_side_2 = st.columns(2)
+
+with mw_side_1:
+    mw_country_1 = st.selectbox(
+        'Select country/area 1:',
+        (clean_df['country'].unique())
+    )
+
+with mw_side_2:
+    mw_country_2 = st.selectbox(
+        'Select country/area 2:',
+        (clean_df['country'].unique())
+    )
+
+mw_sample_1 = clean_df[clean_df['country'] == mw_country_1].copy()
+mw_sample_1 = mw_sample_1.drop('iso_code', axis=1)
+mw_sample_1 = mw_sample_1.drop('country', axis=1)
+
+mw_sample_2 = clean_df[clean_df['country'] == mw_country_2].copy()
+mw_sample_2 = mw_sample_2.drop('iso_code', axis=1)
+mw_sample_2 = mw_sample_2.drop('country', axis=1)
+
+mw_test = pd.DataFrame(
+    index=mw_sample_1.columns.tolist(),
+    columns=['statistic', 'p-value']
+)
+
+mw_test['statistic'] = stats.mannwhitneyu(mw_sample_1, mw_sample_2, alternative='less').statistic
+mw_test['p-value'] = stats.mannwhitneyu(mw_sample_1, mw_sample_2, alternative='less').pvalue
+
+st.dataframe(mw_test.T)
+
+# =========================================================
+st.subheader('Friedman Test')
+
+# =========================================================
+st.header('Correlation')
+'''
+We are going to use Spearman correlation because the data is not normally distributed.
+Below here we can see the correlation table plotted on a heatmap from the cleaned dataset.
+We can also see correlation heatmap of the raw dataset below so we can compare the correlation between and after data cleaning.
+The color orange represents positive correlation while color blue represents negative correlation.
+The brighter the color, the closer the correlation coefficient is to value 1 (+1 for light orange, -1 for light blue).
+While the darker the color, the closer the correlation coefficient is to value 0.
+There are no correlation between variables if the correlation coefficient is 0.
+
+From the correlation heatmap we can make conclusions as follows:
+1. We can see better correlation on the cleaned dataset than on the raw dataset.
+2. Only flaring_co2_percapita and trade_co2_share have negative correlation with most of the other variables.
+3. Variable year and co2_growth_prct have the least correlation with other variables. 
+'''
+
+with st.expander('Correlation using cleaned dataset'):
+    fig, ax = plt.subplots(figsize=(16, 12))
+    sns.heatmap(clean_df.corr(method='spearman'), linewidths=0.1, center=0)
+    st.pyplot(fig)
+
+with st.expander('Correlation using raw dataset'):
+    fig, ax = plt.subplots(figsize=(16, 12))
+    sns.heatmap(df.corr(method='spearman'), linewidths=0.1, center=0)
+    st.pyplot(fig)
