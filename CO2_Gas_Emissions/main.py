@@ -27,6 +27,17 @@ st.set_page_config(
 
 st.title('CO2 and Greenhouse Gas Emissions')
 
+content_1, content_2 = st.columns(2)
+
+with content_1:
+    '''
+    Greenhouse gases trap heat and make the planet warmer. Human activities are responsible for almost all of the increase in greenhouse gases in the atmosphere over the last hundred years. Carbon dioxide (CO2) makes up the vast majority of greenhouse gas emissions from the sector, but smaller amounts of methane (CH4) and nitrous oxide (N2O) are also emitted. These gases are released during the combustion of fossil fuels, such as coal, oil, and natural gas, to produce electricity. Greenhouse gas emissions from human activities strengthen the greenhouse effect, contributing to climate change.
+    '''
+
+with content_2:
+    image = Image.open(path + '/factory.jpg')
+    st.image(image, width=240)
+
 # =========================================================
 st.header('The Raw Dataset')
 '''
@@ -718,7 +729,7 @@ for col in ft_sample_1.columns.tolist():
 
 st.dataframe(ft_df.T)
 
-with st.expander('Non-Paramtrics Test Note'):
+with st.expander('Non-Parametrics Test Note'):
     '''
     Notice if we refresh the page, you can see that the p-value on the wilcoxon and friedman test changing. The reason behind this is because the size of the data is different between those year. Wilcoxon and friedman can only be done if all the testing data have the same size, if not it will return an error. So to handle this we do sampling according to the smaller data's size and the sampling is done randomly. 
     
@@ -751,3 +762,18 @@ with st.expander('Correlation using raw dataset'):
     fig, ax = plt.subplots(figsize=(16, 12))
     sns.heatmap(df.corr(method='spearman'), linewidths=0.1, center=0)
     st.pyplot(fig)
+
+# =========================================================
+st.header('Sources & References')
+'''
+Column descriptions: [https://github.com/owid/co2-data](https://github.com/owid/co2-data)
+
+Data cleaning documentation code: [https://www.kaggle.com/code/hasyimabdillah/data-cleaning-world-co2-emission/notebook](https://www.kaggle.com/code/hasyimabdillah/data-cleaning-world-co2-emission/notebook)
+
+Streamlit code: [https://github.com/HasyimAP/Streamlit-Content/blob/main/CO2_Gas_Emissions/main.py](https://github.com/HasyimAP/Streamlit-Content/blob/main/CO2_Gas_Emissions/main.py)
+
+Full documentation: [https://github.com/HasyimAP/Streamlit-Content/tree/main/CO2_Gas_Emissions](https://github.com/HasyimAP/Streamlit-Content/tree/main/CO2_Gas_Emissions)
+
+Author profile: [https://github.com/HasyimAP](https://github.com/HasyimAP),
+[https://www.linkedin.com/in/m-hasyim-abdillah-p-391079237/](https://www.linkedin.com/in/m-hasyim-abdillah-p-391079237/)
+'''
