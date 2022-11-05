@@ -1,8 +1,6 @@
 import os
-import numpy as np
 import pandas as pd
 import seaborn as sns
-import pingouin as pg
 import streamlit as st
 import plotly.express as px
 import statsmodels.api as sm
