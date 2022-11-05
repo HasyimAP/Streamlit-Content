@@ -14,7 +14,7 @@ from scipy import stats
 # dataset
 path = os.path.dirname(__file__)
 df = pd.read_csv(path + '/owid-co2-data.csv')
-clean_df = pd.read_csv(path + '/clean-data-mae-sgd-2.csv')
+clean_df = pd.read_csv(path + '/clean-data-mae-sgd.csv')
 
 # page title
 icon = Image.open(path + '/co2.png')
