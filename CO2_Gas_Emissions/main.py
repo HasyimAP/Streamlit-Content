@@ -307,7 +307,7 @@ col_test.remove('iso_code')
 col_test.remove('country')
 
 with nt_1:
-    ''' #### Kolmogrov-Smirnov Test '''
+    ''' #### Kolmogorov-Smirnov Test '''
     ks_df = pd.DataFrame(
         index=col_test,
         columns=['statistic', 'p-value']
@@ -762,6 +762,20 @@ with st.expander('Correlation using raw dataset'):
     fig, ax = plt.subplots(figsize=(16, 12))
     sns.heatmap(df.corr(method='spearman'), linewidths=0.1, center=0)
     st.pyplot(fig)
+
+# =========================================================
+st.header('Conclusion')
+'''
+Humans are the main factor of the increase in greenhouse gasses in the world. Economic growth causes growth in the industrial sector which causes many factories and business entities to be built. 
+Technological developments have also made businesses that initially relied on the ability of humans and animals to turn to machines. 
+Although it makes people's lives easier and more prosperous, unknowingly this also causes negative impacts on the environment.
+
+The increase in greenhouse gasses seems to depend on the increase in the population of a region. 
+More people means more jobs, more transportation, and ultimately more pollution. 
+If you look at it in a short period of time, there is no significant difference. 
+But if we look to the past, to a more distant timeline, we can see the difference that humans have made. 
+Even pollution due to CO2 gas can be felt more in areas with densely populated areas.
+'''
 
 # =========================================================
 st.header('Sources & References')
