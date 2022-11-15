@@ -18,7 +18,10 @@ st.set_page_config(
 )
 
 # ===================================================================
-st.header('Wayang Indonesia')
+'''
+# Wayang Indonesia
+by Bangkit Flex Team
+'''
 
 # ===================================================================
 col1_cont1, col2_cont1 = st.columns([1, 2])
