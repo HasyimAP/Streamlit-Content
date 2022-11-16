@@ -2,3 +2,4 @@ streamlit==1.14.0
 plotly==5.10.0
 openpyxl==3.0.10
 geopandas==0.12.1
+matplotlib==3.6.0
