@@ -5,6 +5,8 @@ import geopandas as gpd
 import plotly.express as px
 import matplotlib.pyplot as plt
 
+from PIL import Image
+
 # dataset
 path = os.path.dirname(__file__)
 data_file = path + '/data wayang.xlsx'
@@ -210,8 +212,51 @@ Dalam setiap interval 3 tahun terlihat konsentrasi peminat seni pewayangan mayor
 Selain itu jika diperhatikan lebih detail lagi, ada beberapa daerah yang presentase penduduknya yang menonton seni pewayangan **di bawah 1%**.
 Presentase penduduk yang menonton seni pewayangan dari tahun ke tahun juga mengalami **penurunan** yang cukup terlihat jelas.
 
-\*Di tahun 2009 dan 2012 Provinsi Kalimantan Utara diberi garis merah karena pada tahun tersebut belum terjadi pemekaran Provinsi Kalimantan Utara.
+\*Di tahun 2009 dan 2012 Provinsi Kalimantan Utara diberi garis merah karena pada tahun tersebut **belum** terjadi pemekaran Provinsi Kalimantan Utara.
 '''
+
+# ===================================================================
+st.subheader('Apa Yang Mungkin Akan Terjadi?')
+
+col1_cont5, col2_cont5 = st.columns([2,1])
+
+with col1_cont5:
+    '''
+    Masih sulit untuk memprediksi apa yang akan terjadi dalam beberapa tahun ke depan akibat minimnya data yang tersedia.
+    Namun, dengan melihat data yang kita miliki saat ini dapat diprediksi bahwa jumlah peminat seni pewayangan ke depannya akan **semakin berkurang**.
+    Meskipun distribusi dari segi umur, jenis kelamin, dan daerah terlihat sama dari tahun ke tahunnya, tapi tidak dapat dipungkiri bahwa **jumlah keseluruhan dari peminat wayang terus menurun**.
+    Terutama peminat dari kalangan muda yang berusia di bawah 30 tahun.
+    Provinsi Bali masih memiliki jumlah peminat yang lebih banyak dibandingkan daerah lainnya kemungkinan dikarenakan faktor pariwisata yang membuat pendatang tidak hanya tertarik dengan budaya Provinsi Bali, tapi juga budaya daerah lainnya.
+    Lalu di Yogyakarta juga memiliki peminat yang cukup tinggi dibandingkan daerah lainnya karena di sana terdapat banyak sekolah serta institusi yang membantu dalam melestarikan budaya Indonesia seperti wayang.
+    Namun tidak semua provinsi di Indonesia seperti 2 provinsi tersebut, ditambah lagi jumlah serta kepadatan penduduk yang lebih kecil di luar Pulau Jawa.
+    '''
+
+with col2_cont5:
+    image = Image.open(path + '/wayang_1.jpg')
+    st.image(image, width=240)
+
+# ===================================================================
+st.subheader('Apa Yang Dapat Kita Lakukan?')
+
+col1_cont6, col2_cont6 = st.columns([1,2])
+
+with col1_cont6:
+    image = Image.open(path +'/wayang_2.jpg')
+    st.image(image, width=420)
+
+with col2_cont6:
+    '''
+    Meningkatkan minat masyarakat terhadap seni pewayangan bukanlah hal yang mudah.
+    Ada berbagai cara yang dapat dilakukan untuk meningkatkan minat masyarakat terhadap seni pewayangan, tapi tidak semuanya memberikan hasil yang instan dan beberapa membutuhkan waktu.
+    Salah satu dari berbagai cara tersebut dengan menggunakan teknologi.
+    Dengan memanfaatkan perkembangan teknologi kita dapat membuat masyarakat menjadi lebih dekat dengan seni pewayangan.
+    Dan teknologi yang dapat kita gunakan tersebut salah satunya adalah perkembangan machine learning.
+
+    Agar masyarakat mulai mengenal seni pewayangan lebih dekat kita memiliki beberapa opsi pendekatan, seperti jenis wayang, cerita-cerita populer dalam seni pewayangan, tokoh-tokoh dalam seni pewayangan, dan banyak lainnya.
+    Kami memilih pendekatan melalui tokoh-tokoh pewayangan.
+    Dengan memanfaatkan machine learning, kami mengembangkan aplikasi berbasis web yang dapat membantu mengenali karakter/tokoh wayang.
+    Dengan adanya aplikasi ini diharapkan dapat meningkatkan ketertarikan masyarakat terhadap seni pewayangan.
+    '''
 
 # ===================================================================
 st.subheader('Sumber Referensi')
