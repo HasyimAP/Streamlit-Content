@@ -1,7 +1,9 @@
 import os
 import pandas as pd
 import streamlit as st
+import geopandas as gpd
 import plotly.express as px
+import matplotlib.pyplot as plt
 
 # dataset
 path = os.path.dirname(__file__)
@@ -10,6 +12,7 @@ data_file = path + '/data wayang.xlsx'
 df_region = pd.read_excel(data_file, sheet_name='Tipe daerah')
 df_gender = pd.read_excel(data_file, sheet_name='Jenis kelamin')
 df_age = pd.read_excel(data_file, sheet_name='Umur')
+df_prov = pd.read_excel(data_file, sheet_name='Provinsi')
 
 # page settings
 st.set_page_config(
@@ -20,7 +23,14 @@ st.set_page_config(
 # ===================================================================
 '''
 # Wayang Indonesia
-by Bangkit Flex Team
+###### by Bangkit Flex Team
+
+Data yang digunakan berasal dari situs web Badan Pusat Statistika (BPS) Indonesia.
+Data bersumber dari buku katalog Statistik Sosial Budaya yang diterbitkan oleh BPS setiap 3 tahun.
+Sehingga data yang tercantum pada *dashboard* analisis memiliki interval setiap 3 tahun.
+Berdasarkan katalog, seni pewayangan termasuk ke dalam seni drama/teater/pedalangan.
+Jadi pada analisi berikut ini mengikuti parameter yang tercantum pada katalog sumber.
+Setiap katalog memiliki nama parameter yang berbeda, tapi memiliki maksud yang sama.  
 '''
 
 # ===================================================================
@@ -142,6 +152,66 @@ with col2_cont4:
     Jika dibandingkan dari tahun ke tahun pula, jumlah peminat seni pewayangan terus menurun di berbagai kalangan usia.
     Kecuali di tahun 2015 terjadi sedikit peningkatan pada peminat seni pewayangan di semua kelompok umur dibandingkan tahun 2012. 
     '''
+
+# ===================================================================
+st.subheader('Berdasarkan Provinsi')
+
+df_geo = gpd.read_file(path + '/gadm41_IDN_1.json')
+
+df_join = df_geo.merge(df_prov, how='inner', left_on='NAME_1', right_on='Provinsi')
+df_join = df_join[[
+    'Provinsi', 
+    2009,
+    2012,
+    2015,
+    2018,
+    2021, 
+    'geometry'
+]]
+
+year = st.selectbox(
+    'Pilih tahun: ',
+    options=df_age['Tahun'].unique().tolist()
+)
+
+fig, ax = plt.subplots(1, figsize=(21,7), constrained_layout=True)
+
+ax.axis('off')
+
+sm = plt.cm.ScalarMappable(cmap='OrRd', norm=plt.Normalize(vmin=0, vmax=df_join[year].max()*1.2))
+
+cbar = fig.colorbar(sm, ax=ax)
+
+df_join.plot(
+    column=year,
+    cmap='OrRd',
+    linewidth=1,
+    edgecolor='0.8',
+    norm=plt.Normalize(vmin=0, vmax=df_join[year].max()*1.2),
+    ax=ax,
+    missing_kwds={
+        'color': 'lightgrey',
+        'edgecolor': 'red',
+        'hatch': '///',
+    }
+)
+
+df_join['coords'] = df_join['geometry'].apply(lambda x: x.representative_point().coords[:])
+df_join['coords'] = [coords[0] for coords in df_join['coords']]
+for idx, row in df_join.iterrows():
+    plt.annotate(row['Provinsi'], xy=row['coords'], horizontalalignment='center')
+
+st.pyplot(fig)
+
+'''
+Pada grafik dapat terlihat bahwa **semakin gelap warna merah** pada peta menandakan bahwa **semakin tinggi konsentrasi peminat seni pewayangan** pada daerah tersebut.
+Melalui skala warna di kanan peta dapat dilihat nilai presentase (%) dari jumlah penduduk yang menonton seni pewayangan pada tahun tersebut.
+Dalam setiap interval 3 tahun terlihat konsentrasi peminat seni pewayangan mayoritas berada di Pulau Jawa dan Bali, terutama di Jawa Timur, Yogyakarta, dan Bali.
+Selain itu jika diperhatikan lebih detail lagi, ada beberapa daerah yang presentase penduduknya yang menonton seni pewayangan **di bawah 1%**.
+Presentase penduduk yang menonton seni pewayangan dari tahun ke tahun juga mengalami **penurunan** yang cukup terlihat jelas.
+
+\*Di tahun 2009 dan 2012 Provinsi Kalimantan Utara diberi garis merah karena pada tahun tersebut belum terjadi pemekaran Provinsi Kalimantan Utara.
+'''
 
 # ===================================================================
 st.subheader('Sumber Referensi')
