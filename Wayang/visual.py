@@ -223,12 +223,12 @@ col1_cont5, col2_cont5 = st.columns([2,1])
 with col1_cont5:
     '''
     Masih sulit untuk memprediksi apa yang akan terjadi dalam beberapa tahun ke depan akibat minimnya data yang tersedia.
-    Namun, dengan melihat data yang kita miliki saat ini dapat diprediksi bahwa jumlah peminat seni pewayangan ke depannya akan **semakin berkurang**.
+    Namun, dengan melihat data yang kita miliki saat ini terdapat kemungkinan jumlah peminat seni pewayangan ke depannya akan **semakin berkurang**.
     Meskipun distribusi dari segi umur, jenis kelamin, dan daerah terlihat sama dari tahun ke tahunnya, tapi tidak dapat dipungkiri bahwa **jumlah keseluruhan dari peminat wayang terus menurun**.
     Terutama peminat dari kalangan muda yang berusia di bawah 30 tahun.
     Provinsi Bali masih memiliki jumlah peminat yang lebih banyak dibandingkan daerah lainnya kemungkinan dikarenakan faktor pariwisata yang membuat pendatang tidak hanya tertarik dengan budaya Provinsi Bali, tapi juga budaya daerah lainnya.
     Lalu di Yogyakarta juga memiliki peminat yang cukup tinggi dibandingkan daerah lainnya karena di sana terdapat banyak sekolah serta institusi yang membantu dalam melestarikan budaya Indonesia seperti wayang.
-    Namun tidak semua provinsi di Indonesia seperti 2 provinsi tersebut, ditambah lagi jumlah serta kepadatan penduduk yang lebih kecil di luar Pulau Jawa.
+    Namun tidak semua provinsi di Indonesia memiliki keadaan seperti 2 provinsi tersebut, ditambah lagi jumlah serta kepadatan penduduk yang lebih kecil di luar Pulau Jawa.
     '''
 
 with col2_cont5:
