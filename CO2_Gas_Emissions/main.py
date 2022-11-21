@@ -406,19 +406,13 @@ Alternative Hypothesis (H0): The data distribution between all samples/groups ar
 We can reject H0 if the p-value on the variables we observed are less than 5%.
 '''
 
-sample_size = st.number_input(
-    'Number of samples (max. 10): ',
-    min_value=2,
-    max_value=10,
-    step=1
-)
-
 kw_country = st.multiselect(
-    'Choose the countries/areas:',
+    'Choose the countries/areas (min. 2, max. 10):',
     options=clean_df['country'].unique(),
-    max_selections=sample_size
+    max_selections=10
 )
 
+sample_size = len(kw_country)
 kw_dict = []
 
 for country in kw_country:
@@ -700,7 +694,6 @@ with ft_col_3:
         step=1
     )
 
-
 ft_sample_1 = clean_df[clean_df['year'] == ft_year_1].drop(['iso_code', 'year', 'country'], axis=1)
 ft_sample_1.reset_index(inplace=True, drop=True)
 ft_sample_2 = clean_df[clean_df['year'] == ft_year_2].drop(['iso_code', 'year', 'country'], axis=1)
@@ -724,8 +717,6 @@ for col in ft_sample_1.columns.tolist():
         [ft_sample_2.loc[:, col]],
         [ft_sample_3.loc[:, col]],
     )
-
-# ft_df['statistic'], ft_df['p-value'] = stats.friedmanchisquare(ft_sample_1, ft_sample_2, ft_sample_3)
 
 st.dataframe(ft_df.T)
 
