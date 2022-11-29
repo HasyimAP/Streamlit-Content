@@ -25,14 +25,14 @@ st.set_page_config(
 # ===================================================================
 '''
 # Wayang Indonesia
-###### by Bangkit Flex Team
+###### by Bangkit-Flex Team
 
 Data yang digunakan berasal dari situs web Badan Pusat Statistika (BPS) Indonesia.
 Data bersumber dari buku katalog Statistik Sosial Budaya yang diterbitkan oleh BPS setiap 3 tahun.
 Sehingga data yang tercantum pada *dashboard* analisis memiliki interval setiap 3 tahun.
 Berdasarkan katalog, seni pewayangan termasuk ke dalam seni drama/teater/pedalangan.
 Jadi pada analisi berikut ini mengikuti parameter yang tercantum pada katalog sumber.
-Setiap katalog memiliki nama parameter yang berbeda, tapi memiliki maksud yang sama.  
+Setiap katalog memiliki nama parameter yang berbeda (seni drama, teater, pedalangan, pewayangan), tapi memiliki maksud yang sama.  
 '''
 
 # ===================================================================
@@ -99,7 +99,7 @@ col1_cont3, col2_cont3 = st.columns([1, 2])
 with col1_cont3:
     st.subheader('Berdasarkan Jenis Kelamin')
     '''
-    Meskipun minat masyarakat terhadap seni pewayangan menurun dari tahun ke tahun, presentase peminat laki-laki selalu lebih banyak dibandingkan perempuan.
+    Meskipun minat masyarakat terhadap seni pewayangan menurun dari tahun ke tahun, presentase peminat laki-laki selalu lebih banyak dibandingkan perempuan di tiap tahunnya.
     Melihat total jumlah penduduk laki-laki dan perempuan di Indonesia tidak berbeda jauh, maka dapat dikatakan secara absolut jumlah peminat laki-laki selalu lebih banyak dibandingkan perempuan terhadap seni pewayangan.
     '''
 
